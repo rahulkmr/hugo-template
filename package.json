@@ -4,7 +4,10 @@
   "description": "hugo template with asset pipeline",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "gulp develop",
+    "start-preview": "gulp develop-preview",
+    "build": "NODE_ENV=production gulp build",
+    "build-preview": "NODE_ENV=production gulp build-preview"
   },
   "author": "",
   "license": "MIT",
