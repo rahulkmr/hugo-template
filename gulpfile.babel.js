@@ -6,6 +6,7 @@ import BrowserSync from 'browser-sync'
 import webpack from 'webpack'
 import logger from 'fancy-log'
 import { spawn } from 'child_process'
+import fs from 'fs'
 
 import constants from './constants'
 import webpackConfig from './webpack.config.js'
@@ -17,6 +18,7 @@ const scriptsGlob = './src/scripts/**/*.js'
 const fontsGlob = './src/styles/**/*'
 const hugoRoot = './site'
 const hugoGlob = `./${hugoRoot}/**/*`
+const webpackScriptsBundle = `./${hugoRoot}/layouts/partials/${constants.webpackScriptsBundle}`
 const hugoDefaultArgs = ['-d', `../${constants.buildPath}`, '-s', 'site', '-v']
 const hugoPreviewArgs = hugoDefaultArgs.concat(['--buildDrafts', '--buildFuture'])
 const assetsTasks = ['scripts', 'styles', 'fonts']
@@ -45,7 +47,7 @@ gulp.task('styles', () =>
         .pipe(sourcemaps.init())
         .pipe(postcss())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest(`./${constants.buildPath}/styles`))
+        .pipe(gulp.dest(`${constants.buildPath}/styles`))
         .pipe(browserSync.stream())
 )
 
@@ -58,6 +60,7 @@ gulp.task('scripts', (done) => {
         colors: true,
         progress: true
     }))
+      fs.copyFileSync(`${constants.buildPath}/${constants.webpackScriptsBundle}`, webpackScriptsBundle)
     browserSync.reload()
     done()
   })
@@ -82,6 +85,7 @@ const runServer = () => {
     gulp.watch(scriptsGlob, ['scripts'])
     gulp.watch(fontsGlob, ['fonts'])
     gulp.watch(hugoGlob, ['hugo'])
+    gulp.watch(webpackScriptsBundle, ['hugo'])
 }
 
 

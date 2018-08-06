@@ -37,7 +37,7 @@ let config = {
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/webpack_bundle.html',
-            filename: 'webpack_bundle.html',
+            filename: constants.webpackScriptsBundle,
         }),
         new webpack.HashedModuleIdsPlugin(),
         new ManifestPlugin(),
