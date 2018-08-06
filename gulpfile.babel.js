@@ -1,5 +1,6 @@
 import gulp from 'gulp'
 import flatten from 'gulp-flatten'
+import imagemin from 'gulp-imagemin'
 import sourcemaps from 'gulp-sourcemaps'
 import postcss from 'gulp-postcss'
 import BrowserSync from 'browser-sync'
@@ -16,6 +17,7 @@ const browserSync = BrowserSync.create()
 const stylesGlob = './src/styles/**/*.css'
 const scriptsGlob = './src/scripts/**/*.js'
 const fontsGlob = './src/styles/**/*'
+const imagesGlob = './src/images/**/*'
 const hugoRoot = './site'
 const hugoGlob = `./${hugoRoot}/**/*`
 const webpackScriptsBundle = `./${hugoRoot}/layouts/partials/${constants.webpackScriptsBundle}`
@@ -68,11 +70,18 @@ gulp.task('scripts', (done) => {
 
 
 gulp.task('fonts', () => (
-  gulp.src(fontsGlob)
-    .pipe(flatten())
-    .pipe(gulp.dest(`./${constants.buildPath}/fonts`))
-    .pipe(browserSync.stream())
+    gulp.src(fontsGlob)
+        .pipe(flatten())
+        .pipe(gulp.dest(`./${constants.buildPath}/fonts`))
+        .pipe(browserSync.stream())
 ))
+
+
+gulp.task('images', () => 
+    gulp.src(imagesGlob)
+        .pipe(imagemin())
+        .pipe(gulp.dest(`./${constants.buildPath}/images`))
+        .pipe(browserSync.stream()))
 
 
 const runServer = () => {
@@ -84,6 +93,7 @@ const runServer = () => {
     gulp.watch(stylesGlob, ['styles'])
     gulp.watch(scriptsGlob, ['scripts'])
     gulp.watch(fontsGlob, ['fonts'])
+    gulp.watch(imagesGlob, ['images'])
     gulp.watch(hugoGlob, ['hugo'])
     gulp.watch(webpackScriptsBundle, ['hugo'])
 }
