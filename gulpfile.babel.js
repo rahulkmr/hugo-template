@@ -2,8 +2,6 @@ import gulp from 'gulp'
 import flatten from 'gulp-flatten'
 import sourcemaps from 'gulp-sourcemaps'
 import postcss from 'gulp-postcss'
-import postcssPresetEnv from 'postcss-preset-env'
-import postcssImport from 'postcss-import'
 import BrowserSync from 'browser-sync'
 import webpack from 'webpack'
 import logger from 'fancy-log'
@@ -45,7 +43,7 @@ gulp.task('hugo-preview', (done) => runHugo(done, hugoPreviewArgs))
 gulp.task('styles', () =>
     gulp.src(stylesGlob)
         .pipe(sourcemaps.init())
-        .pipe(postcss([postcssImport(), postcssPresetEnv()]))
+        .pipe(postcss())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(`./${constants.buildPath}/styles`))
         .pipe(browserSync.stream())
