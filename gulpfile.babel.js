@@ -19,17 +19,21 @@ const scriptsGlob = './src/scripts/**/*.js'
 const fontsGlob = './src/styles/**/*'
 const hugoRoot = './site'
 const hugoGlob = `./${hugoRoot}/**/*`
-const hugoDefaultArgs = ['-d', constants.buildPath, '-s', 'site', '-v']
+const hugoDefaultArgs = ['-d', `../${constants.buildPath}`, '-s', 'site', '-v']
 const hugoPreviewArgs = hugoDefaultArgs.concat(['--buildDrafts', '--buildFuture'])
 const assetsTasks = ['scripts', 'styles', 'fonts']
-const tasks = assetsTasks.concat(['hugo'])
-const previewTasks = assetsTasks.concat(['hugo-preview'])
 
 
-gulp.task('develop', tasks, (done) => runServer(done))
-gulp.task('develop-preview', previewTasks, (done) => runServer(done))
-gulp.task('build', tasks)
-gulp.task('build-preview', previewTasks)
+gulp.task('develop', assetsTasks, (done) => {
+    runHugo(done, hugoDefaultArgs)
+    return runServer(done)
+})
+gulp.task('develop-preview', assetsTasks, (done) => {
+    runHugo(done, hugoPreviewArgs)
+    return runServer(done)
+})
+gulp.task('build', assetsTasks, (done) => runHugo(done, hugoDefaultArgs))
+gulp.task('build-preview', assetsTasks, (done) => runHugo(done, hugoPreviewArgs))
 gulp.task('default', ['develop'])
 
 
@@ -72,7 +76,9 @@ gulp.task('fonts', () => (
 
 const runServer = () => {
     browserSync.init({
-        baseDir: constants.buildPath
+        server: {
+            baseDir: constants.buildPath
+        }
     })
     gulp.watch(stylesGlob, ['styles'])
     gulp.watch(scriptsGlob, ['scripts'])
