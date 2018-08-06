@@ -7,6 +7,7 @@ import postcssImport from 'postcss-import'
 import BrowserSync from 'browser-sync'
 import webpack from 'webpack'
 import logger from 'fancy-log'
+import { spawn } from 'child_process'
 
 import constants from './constants'
 import webpackConfig from './webpack.config.js'
@@ -14,11 +15,27 @@ import webpackConfig from './webpack.config.js'
 
 const browserSync = BrowserSync.create()
 const stylesGlob = './src/styles/**/*.css'
+const scriptsGlob = './src/scripts/**/*.js'
 const fontsGlob = './src/styles/**/*'
+const hugoRoot = './site'
+const hugoGlob = `./${hugoRoot}/**/*`
+const hugoDefaultArgs = ['-d', constants.buildPath, '-s', 'site', '-v']
+const hugoPreviewArgs = hugoDefaultArgs.concat(['--buildDrafts', '--buildFuture'])
+const assetsTasks = ['scripts', 'styles', 'fonts']
+const tasks = assetsTasks.concat(['hugo'])
+const previewTasks = assetsTasks.concat(['hugo-preview'])
 
 
-gulp.task('develop', ['styles'], (done) => runServer(done))
+gulp.task('develop', tasks, (done) => runServer(done))
+gulp.task('develop-preview', previewTasks, (done) => runServer(done))
+gulp.task('build', tasks)
+gulp.task('build-preview', previewTasks)
 gulp.task('default', ['develop'])
+
+
+
+gulp.task('hugo', (done) => runHugo(done, hugoDefaultArgs))
+gulp.task('hugo-preview', (done) => runHugo(done, hugoPreviewArgs))
 
 
 gulp.task('styles', () =>
@@ -27,6 +44,7 @@ gulp.task('styles', () =>
         .pipe(postcss([postcssImport(), postcssPresetEnv()]))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(`./${constants.buildPath}/styles`))
+        .pipe(browserSync.stream())
 )
 
 
@@ -38,6 +56,7 @@ gulp.task('scripts', (done) => {
         colors: true,
         progress: true
     }))
+    browserSync.reload()
     done()
   })
 })
@@ -50,9 +69,26 @@ gulp.task('fonts', () => (
     .pipe(browserSync.stream())
 ))
 
+
 const runServer = () => {
     browserSync.init({
         baseDir: constants.buildPath
     })
     gulp.watch(stylesGlob, ['styles'])
+    gulp.watch(scriptsGlob, ['scripts'])
+    gulp.watch(fontsGlob, ['fonts'])
+    gulp.watch(hugoGlob, ['hugo'])
+}
+
+
+const runHugo = (done, args) => {
+  return spawn('hugo', args, {stdio: "inherit"}).on("close", (returnCode) => {
+    if (returnCode === 0) {
+      browserSync.reload()
+      done()
+    } else {
+      browserSync.notify("Hugo build failed.")
+      done("Hugo build failed.")
+    }
+  })
 }
