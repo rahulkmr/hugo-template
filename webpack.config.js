@@ -35,14 +35,17 @@ let config = {
         ]
     },
     plugins: [
-        new HtmlWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            template: './src/webpack_bundle.html',
+            filename: 'webpack_bundle.html',
+        }),
         new webpack.HashedModuleIdsPlugin(),
         new ManifestPlugin(),
     ],
 }
 
 
-if (env == 'production') {
+if (env === 'production') {
     config = merge.smart(config, {
         mode: 'production',
         output: {
