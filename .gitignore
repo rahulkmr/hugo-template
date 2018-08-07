@@ -83,3 +83,6 @@ $RECYCLE.BIN/
 
 # OSX
 .DS_Store
+
+site/static/assets/*
+site/data/assets.json
