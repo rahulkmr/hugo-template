@@ -22,7 +22,7 @@ const hugoRoot = './site'
 const hugoGlob = [`./${hugoRoot}/**/*`, `!./${hugoRoot}/resources/_gen/**/*`]
 const hugoDefaultArgs = ['--destination', `../${buildDir}`, '--source', 'site', '-v']
 const hugoPreviewArgs = hugoDefaultArgs.concat(['--buildDrafts', '--buildFuture'])
-const assetsTasks = ['clean', 'scripts', 'styles', 'fonts', 'images']
+const assetsTasks = ['clean', 'webpack', 'fonts', 'images']
 
 
 gulp.task('clean', () => del('dist'))
@@ -45,7 +45,7 @@ gulp.task('styles', ['clean'], () =>
 )
 
 
-gulp.task('scripts', ['clean'], (done) => {
+gulp.task('webpack', ['clean'], (done) => {
     del(`./${buildDir}/assets`)
     webpack(webpackConfig, (error, stats) => {
         if (error) {
@@ -55,7 +55,6 @@ gulp.task('scripts', ['clean'], (done) => {
             colors: true,
             progress: true
         }))
-        browserSync.reload()
         done()
     })
 })
@@ -83,8 +82,7 @@ const runServer = () => {
             baseDir: buildDir,
         }
     })
-    gulp.watch(stylesGlob, ['styles'])
-    gulp.watch(scriptsGlob, ['scripts'])
+    gulp.watch([stylesGlob, scriptsGlob], ['webpack'])
     gulp.watch(fontsGlob, ['fonts'])
     gulp.watch(imagesGlob, ['images'])
     gulp.watch(hugoGlob, ['hugo'])
