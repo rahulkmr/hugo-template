@@ -28,13 +28,11 @@ const assetsTasks = ['clean', 'scripts', 'styles', 'fonts', 'images']
 
 gulp.task('clean', () => del('dist'))
 
-gulp.task('develop', assetsTasks, (done) => {
-    runHugo(done, hugoDefaultArgs)
-    return runServer(done)
+gulp.task('develop', assetsTasks, () => {
+    return runHugo(runServer, hugoDefaultArgs)
 })
-gulp.task('develop-preview', assetsTasks, (done) => {
-    runHugo(done, hugoPreviewArgs)
-    return runServer(done)
+gulp.task('develop-preview', assetsTasks, () => {
+    return runHugo(runServer, hugoPreviewArgs)
 })
 gulp.task('build', assetsTasks, (done) => runHugo(done, hugoDefaultArgs))
 gulp.task('build-preview', assetsTasks, (done) => runHugo(done, hugoPreviewArgs))
