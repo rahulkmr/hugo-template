@@ -13,7 +13,7 @@ let config = {
     },
     output: {
         filename: '[name].[chunkhash].js',
-        path: path.resolve(__dirname, 'site/static/assets'),
+        path: path.resolve(__dirname, './dist/assets'),
     },
     module: {
         rules: [
