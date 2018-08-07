@@ -2,6 +2,7 @@ const path = require('path')
 var ManifestPlugin = require('webpack-manifest-plugin')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const env = process.env.NODE_ENV
@@ -9,7 +10,10 @@ const env = process.env.NODE_ENV
 
 let config = {
     entry: {
-        bundle: ['./assets/scripts/app.js'],
+        bundle: [
+            './assets/scripts/app.js',
+            './assets/styles/app.css',
+        ],
     },
     output: {
         filename: '[name].[chunkhash].js',
@@ -30,12 +34,30 @@ let config = {
                     'eslint-loader',
                 ]
             },
+            {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,
+                        }
+                    },
+                    'postcss-loader',
+                ],
+            },
+
         ]
     },
     plugins: [
         new webpack.HashedModuleIdsPlugin(),
+        new MiniCssExtractPlugin({
+            filename: '[name].[chunkhash].css',
+            chunkFilename: '[name].[hash].css',
+        }),
         new ManifestPlugin({
-            fileName: '../../data/assets.json',
+            fileName: '../../site/data/assets.json',
         }),
     ],
     optimization: {
@@ -71,7 +93,6 @@ if (env === 'production') {
             }),
         ],
     })
-
 }
 
 module.exports = config
